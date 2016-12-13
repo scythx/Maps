@@ -46,7 +46,7 @@ private:
 	int		width;
 	int		height;
 	
-	float	divisor;
+	float	scale;
 
 	BBitmap* bitmap;
 	

@@ -4,6 +4,8 @@
 #include <Messenger.h>
 #include <TranslationUtils.h>
 
+#include <math.h>
+
 char baseUrl[1024] = "https://api.mapbox.com/styles/v1/mapbox/streets-v8/static/%f,%f,%f,%f,%f/%dx%d?access_token=pk.eyJ1IjoicmFlZmFsZGhpYSIsImEiOiJjaXdnN3J0YTkwMTV1MnVraXgzNGowbTBuIn0.9RYCJF1sfuUD86QRuBItYw&attribution=false&logo=false";
 
 MapsView::MapsView(float _longitude, float _latitude, float _zoom, 
@@ -79,7 +81,7 @@ void MapsView::SetLatitude(float _latitude) {
 
 void MapsView::SetZoom(float _zoom) {
 	zoom = _zoom;
-	divisor = 1.4 + (1.8 * zoom);
+	scale = 1.5 * pow(2.0, zoom);
 }
 
 void MapsView::Draw(BRect updateRect){
@@ -100,18 +102,18 @@ void MapsView::MouseDown(BPoint where) {
 void MapsView::MouseUp(BPoint where) {
 	if (IsMouseDown) {
 		IsMouseDown = false;
-		
+
 		if (pastPoint.x < where.x) {
-			SetLongitude(longitude - ((where.x - pastPoint.x) / divisor));
+			SetLongitude(longitude - ((where.x - pastPoint.x) / scale));
 		}
 		else if (pastPoint.x > where.x) {
-			SetLongitude(longitude + ((pastPoint.x - where.x) / divisor));
+			SetLongitude(longitude + ((pastPoint.x - where.x) / scale));
 		}
 		if (pastPoint.y < where.y) {
-			SetLatitude(latitude + ((where.y - pastPoint.y) / (divisor / 0.9)));
+			SetLatitude(latitude + ((where.y - pastPoint.y) / scale));
 		}
 		else if (pastPoint.y > where.y) {
-			SetLatitude(latitude - ((pastPoint.y - where.y) / (divisor / 0.9)));
+			SetLatitude(latitude - ((pastPoint.y - where.y) / scale));
 		}
 		Refresh();
 	}
