@@ -6,7 +6,7 @@
 
 #include <math.h>
 
-char baseUrl[1024] = "https://api.mapbox.com/styles/v1/mapbox/streets-v8/static/%f,%f,%f,%f,%f/%dx%d?access_token=pk.eyJ1IjoicmFlZmFsZGhpYSIsImEiOiJjaXdnN3J0YTkwMTV1MnVraXgzNGowbTBuIn0.9RYCJF1sfuUD86QRuBItYw&attribution=false&logo=false";
+static BString baseUrl("https://api.mapbox.com/styles/v1/mapbox/streets-v8/static/%f,%f,%f,%f,%f/%dx%d?access_token=pk.eyJ1IjoicmFlZmFsZGhpYSIsImEiOiJjaXdnN3J0YTkwMTV1MnVraXgzNGowbTBuIn0.9RYCJF1sfuUD86QRuBItYw&attribution=false&logo=false");
 
 MapsView::MapsView(float _longitude, float _latitude, float _zoom, 
 				float _bearing, float _pitch, int _width, int _height) : BView("mapsView", B_WILL_DRAW) {
@@ -30,29 +30,23 @@ MapsView::~MapsView() {
 void MapsView::Refresh() {
 	if (request != NULL)
 	{
+		request->Stop();
+		kill_thread(thread);
+		
 		delete listener->bitmapData;
 		delete listener;
 		delete request;
+		
+		listener	= NULL;
+		request		= NULL;
 	}
-	char dataUrl[1024];
-	sprintf(dataUrl, baseUrl, longitude, latitude, zoom, bearing, pitch, width, height);
-
+	BString dataUrl;
+	dataUrl.SetToFormat(baseUrl.String(), longitude, latitude, zoom, bearing, pitch, width, height);
+	
 	listener = new MapsViewListener(this);
-	request = BUrlProtocolRoster::MakeRequest(BUrl(dataUrl), listener);
-		
+	request = BUrlProtocolRoster::MakeRequest(BUrl(dataUrl.String()), listener);
+
 	thread = request->Run();
-	
-	wait_for_thread(thread, NULL);
-	
-	bitmap = BTranslationUtils::GetBitmap(listener->bitmapData);
-
-	delete listener->bitmapData;
-	delete listener;
-	delete request;
-		
-	request		= NULL;
-
-	Invalidate();
 }
 
 void MapsView::SetLongitude(float _longitude) {
@@ -132,23 +126,20 @@ void MapsViewListener::DataReceived(BUrlRequest* caller, const char* data, off_t
 }
 
 void MapsViewListener::RequestCompleted(BUrlRequest* caller, bool success) {
-//		BMessenger messenger(target);
-	
-//		messenger.SendMessage(new BMessage(REQUEST_FINISHED));
+	if (success) {
+		BMessenger messenger(target);
+		messenger.SendMessage(new BMessage(REQUEST_SUCCESS));
+	}
 }
 
 void MapsView::MessageReceived(BMessage* message) {
 	switch (message->what) {
-		case REQUEST_FINISHED: {
+		case REQUEST_SUCCESS: {
+			delete bitmap;
+
 			bitmap = BTranslationUtils::GetBitmap(listener->bitmapData);
-
-			delete listener->bitmapData;
-			delete listener;
-			delete request;
-
-			request		= NULL;
-
 			Invalidate();
+
 			break;
 		}
 		default: {

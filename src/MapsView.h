@@ -7,7 +7,7 @@
 #include <UrlProtocolRoster.h>
 #include <UrlProtocolListener.h>
 
-#define REQUEST_FINISHED 0x0001
+#define REQUEST_SUCCESS 0x0001
 
 class MapsViewListener : public BUrlProtocolListener {
 private:
@@ -15,11 +15,11 @@ private:
 public:
 	BMallocIO *bitmapData;
 	
-	MapsViewListener(BHandler* handler);
+	MapsViewListener(BHandler*);
  	virtual ~MapsViewListener();
 	
-	virtual void DataReceived(BUrlRequest* caller, const char* data, off_t position, ssize_t size);
-	virtual void RequestCompleted(BUrlRequest* caller, bool success);
+	virtual void DataReceived(BUrlRequest*, const char*, off_t, ssize_t);
+	virtual void RequestCompleted(BUrlRequest*, bool);
 };
 
 class MapsView : public BView {
@@ -29,9 +29,9 @@ public:
 
 	void Refresh();
 
-	virtual void Draw(BRect updateRect);
-	virtual void MouseDown(BPoint where);
-	virtual void MouseUp(BPoint where);
+	virtual void Draw(BRect);
+	virtual void MouseDown(BPoint);
+	virtual void MouseUp(BPoint);
 	virtual void MessageReceived(BMessage*);
 
 	void SetLongitude(float);
