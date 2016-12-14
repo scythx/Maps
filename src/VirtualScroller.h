@@ -2,6 +2,7 @@
 #define VIRTUALSCROLLER_H
 
 #include <ScrollBar.h>
+
 #include "MapsView.h"
 
 class VirtualScroller : public BScrollBar {
