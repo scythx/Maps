@@ -1,8 +1,9 @@
 #include "VirtualScroller.h"
 
-VirtualScroller::VirtualScroller(MapsView *target) : BScrollBar(NULL, NULL, 0, 60, B_VERTICAL) {
-	SetTarget(target);
-	view = target;
+#include <Messenger.h>
+
+VirtualScroller::VirtualScroller(BView* target)
+		: BScrollBar(NULL, target, 0, 60, B_VERTICAL) {
 	SetValue(60);
 }
 
@@ -11,6 +12,15 @@ VirtualScroller::~VirtualScroller() {
 }
 
 void VirtualScroller::ValueChanged(float newValue) {
-	view->SetZoom(20 - (newValue / 3));
-	view->Refresh();
+	static bool once = false;
+	if (once) {
+		BMessenger messenger(Target());
+		BMessage* message = new BMessage(VIRTUAL_SCROLLER);
+	
+		message->AddFloat("value", newValue);
+		messenger.SendMessage(message);	
+		
+		return;
+	}
+	once = true;
 }

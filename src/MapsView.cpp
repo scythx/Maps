@@ -1,15 +1,15 @@
 #include "MapsView.h"
 
 #include <stdio.h>
+
 #include <Messenger.h>
 #include <TranslationUtils.h>
-
-#include <math.h>
 
 static BString baseUrl("https://api.mapbox.com/styles/v1/mapbox/streets-v8/static/%f,%f,%f,%f,%f/%dx%d?access_token=pk.eyJ1IjoicmFlZmFsZGhpYSIsImEiOiJjaXdnN3J0YTkwMTV1MnVraXgzNGowbTBuIn0.9RYCJF1sfuUD86QRuBItYw&attribution=false&logo=false");
 
 MapsView::MapsView(float _longitude, float _latitude, float _zoom, 
-				float _bearing, float _pitch, int _width, int _height) : BView("mapsView", B_WILL_DRAW) {
+		float _bearing, float _pitch, int _width, int _height)
+		: BView("mapsView", B_WILL_DRAW) {
 	bitmap		= NULL;				
 	
 	longitude	= _longitude;
@@ -21,10 +21,14 @@ MapsView::MapsView(float _longitude, float _latitude, float _zoom,
 	height		= _height;
 	
 	request		= NULL;
+
+	virtualScroller = new VirtualScroller(this);
+	
+	Refresh();
 }
 
 MapsView::~MapsView() {
-
+	delete virtualScroller;
 }
 
 void MapsView::Refresh() {
@@ -139,6 +143,12 @@ void MapsView::MessageReceived(BMessage* message) {
 			bitmap = BTranslationUtils::GetBitmap(listener->bitmapData);
 			Invalidate();
 
+			break;
+		}
+		case VIRTUAL_SCROLLER: {
+			SetZoom(20 - (message->GetFloat("value", 0.0) / 3));
+			Refresh();
+			
 			break;
 		}
 		default: {

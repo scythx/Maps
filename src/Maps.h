@@ -2,6 +2,7 @@
 #define MAPS_H
 
 #include <Application.h>
+
 #include "MapsWindow.h"
 
 class Maps : public BApplication {

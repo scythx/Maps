@@ -7,7 +7,11 @@
 #include <UrlProtocolRoster.h>
 #include <UrlProtocolListener.h>
 
-#define REQUEST_SUCCESS 0x0001
+#include "VirtualScroller.h"
+
+enum {
+	REQUEST_SUCCESS = 0x0001
+};
 
 class MapsViewListener : public BUrlProtocolListener {
 private:
@@ -53,6 +57,8 @@ private:
 	BUrlRequest*		request;
 	MapsViewListener*	listener;
 	thread_id 			thread;
+
+	VirtualScroller* virtualScroller;
 
 	bool IsMouseDown;
 	BPoint pastPoint;

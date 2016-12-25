@@ -2,14 +2,17 @@
 #define VIRTUALSCROLLER_H
 
 #include <ScrollBar.h>
+#include <View.h>
 
-#include "MapsView.h"
+enum {
+	VIRTUAL_SCROLLER = 0x0002
+};
 
 class VirtualScroller : public BScrollBar {
 private:
-	MapsView *view;
+	BView *view;
 public:
-	VirtualScroller(MapsView *target);
+	VirtualScroller(BView *target);
 	virtual ~VirtualScroller();
 	virtual void ValueChanged(float newValue);
 };
