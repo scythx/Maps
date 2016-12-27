@@ -5,80 +5,23 @@
 #include <Messenger.h>
 #include <TranslationUtils.h>
 
-static BString baseUrl("https://api.mapbox.com/styles/v1/mapbox/streets-v8/static/%f,%f,%f,%f,%f/%dx%d?access_token=pk.eyJ1IjoicmFlZmFsZGhpYSIsImEiOiJjaXdnN3J0YTkwMTV1MnVraXgzNGowbTBuIn0.9RYCJF1sfuUD86QRuBItYw&attribution=false&logo=false");
+#include "MapsData.h"
 
 MapsView::MapsView(float _longitude, float _latitude, float _zoom, 
 		float _bearing, float _pitch, int _width, int _height)
 		: BView("mapsView", B_WILL_DRAW) {
 	bitmap		= NULL;				
-	
-	longitude	= _longitude;
-	latitude	= _latitude;
-	zoom		= _zoom;
-	bearing		= _bearing;
-	pitch		= _pitch;
-	width		= _width;
-	height		= _height;
-	
-	request		= NULL;
 
 	virtualScroller = new VirtualScroller(this);
+
+	MapsData::SetLongitude(_longitude);
+	MapsData::SetLatitude(_latitude);
 	
-	Refresh();
+	MapsData::Retrieve();
 }
 
 MapsView::~MapsView() {
-	delete virtualScroller;
-}
 
-void MapsView::Refresh() {
-	if (request != NULL)
-	{
-		request->Stop();
-		wait_for_thread(thread, NULL);
-		
-		delete request;
-		delete listener;
-		
-		request		= NULL;		
-		listener	= NULL;
-	}
-	BString dataUrl;
-	dataUrl.SetToFormat(baseUrl.String(), longitude, latitude, zoom, bearing, pitch, width, height);
-	
-	listener = new MapsViewListener(this);
-	request = BUrlProtocolRoster::MakeRequest(BUrl(dataUrl.String()), listener);
-
-	thread = request->Run();
-}
-
-void MapsView::SetLongitude(float _longitude) {
-	if (_longitude < -180.0) {
-		longitude = 360.0  + _longitude;
-	}
-	else if (_longitude > 180.0) {
-		longitude = -360.0  + _longitude;
-	}
-	else {
-		longitude = _longitude;
-	}
-}
-
-void MapsView::SetLatitude(float _latitude) {
-	if (_latitude < -90.0) {
-		latitude = -90.0;
-	}
-	else if (_latitude > 90.0) {
-		latitude = 90.0;
-	}
-	else {
-		latitude = _latitude;
-	}
-}
-
-void MapsView::SetZoom(float _zoom) {
-	zoom = _zoom;
-	scale = 1.5 * pow(2.0, zoom);
 }
 
 void MapsView::Draw(BRect updateRect){
@@ -100,54 +43,35 @@ void MapsView::MouseUp(BPoint where) {
 	if (IsMouseDown) {
 		IsMouseDown = false;
 
+		Vector2 coords = MapsData::GetCoords();
+		
 		if (pastPoint.x < where.x) {
-			SetLongitude(longitude - ((where.x - pastPoint.x) / scale));
+			MapsData::SetLongitude(coords.lon - ((where.x - pastPoint.x) / MapsData::GetScale()));
 		}
 		else if (pastPoint.x > where.x) {
-			SetLongitude(longitude + ((pastPoint.x - where.x) / scale));
+			MapsData::SetLongitude(coords.lon + ((pastPoint.x - where.x) / MapsData::GetScale()));
 		}
 		if (pastPoint.y < where.y) {
-			SetLatitude(latitude + ((where.y - pastPoint.y) / scale));
+			MapsData::SetLatitude(coords.lat + ((where.y - pastPoint.y) / MapsData::GetScale()));
 		}
 		else if (pastPoint.y > where.y) {
-			SetLatitude(latitude - ((pastPoint.y - where.y) / scale));
+			MapsData::SetLatitude(coords.lat - ((pastPoint.y - where.y) / MapsData::GetScale()));
 		}
-		Refresh();
-	}
-}
-
-MapsViewListener::MapsViewListener(BHandler* handler) : BUrlProtocolListener(), target(handler) {
-	bitmapData = new BMallocIO();
-}
-
-MapsViewListener::~MapsViewListener() {
- 	delete bitmapData;
-}
- 	
-void MapsViewListener::DataReceived(BUrlRequest* caller, const char* data, off_t position, ssize_t size) {
-		bitmapData->WriteAt(position, data, size);
-}
-
-void MapsViewListener::RequestCompleted(BUrlRequest* caller, bool success) {
-	if (success) {
-		BMessenger messenger(target);
-		messenger.SendMessage(new BMessage(REQUEST_SUCCESS));
+		MapsData::Retrieve();
 	}
 }
 
 void MapsView::MessageReceived(BMessage* message) {
 	switch (message->what) {
-		case REQUEST_SUCCESS: {
-			delete bitmap;
-
-			bitmap = BTranslationUtils::GetBitmap(listener->bitmapData);
+		case MAPDATA_UPDATE: {
+			bitmap = BTranslationUtils::GetBitmap(MapsData::Get());
 			Invalidate();
-
-			break;
+			
+			break;		
 		}
 		case VIRTUAL_SCROLLER: {
-			SetZoom(20 - (message->GetFloat("value", 0.0) / 3));
-			Refresh();
+			MapsData::SetZoom(20 - (message->GetFloat("value", 0.0) / 3));
+			MapsData::Retrieve();
 			
 			break;
 		}
