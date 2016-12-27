@@ -22,6 +22,7 @@ APP_MIME_SIG =
 #%{
 SRCS = \
 	 src/Maps.cpp  \
+	 src/MapsData.cpp  \
 	 src/MapsView.cpp  \
 	 src/MapsWindow.cpp  \
 	 src/VirtualScroller.cpp  \
@@ -40,6 +41,12 @@ RSRCS = \
 
 # End Pe/Eddie support.
 # @<-src@ 
+#%}
+
+#%}
+
+#%}
+
 #%}
 
 #%}
