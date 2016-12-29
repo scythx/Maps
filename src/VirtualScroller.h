@@ -9,8 +9,6 @@ enum {
 };
 
 class VirtualScroller : public BScrollBar {
-private:
-	BView *view;
 public:
 	VirtualScroller(BView *target);
 	virtual ~VirtualScroller();

@@ -1,29 +1,57 @@
 #ifndef MAPSDATA_H
 #define MAPSDATA_H
 
+#include <vector>
+
 #include <Handler.h>
+#include <UrlRequest.h>
+
+class MapsData_Listener;
+
 enum {
 	MAPDATA_UPDATE = 'mdud'
 };
 
-struct Vector2 {
-	float lon;
-	float lat;
+struct MapsVector {
+	int	width;
+	int	height;
+
+	float scale;
+
+	float	longitude;
+	float	latitude;
+	float	zoom;
+	float	bearing;
+	float	pitch;
 };
 
 class MapsData {
-private:
+protected:
 	MapsData();
+	~MapsData();
+	
+	static BMallocIO* 				data;
+	static std::vector<BHandler*> 	handler;
 public:
+	static void Initialize(int, int);
+	static void Retrieve();
+
 	static void SetLongitude(float);
 	static void SetLatitude(float);
 	static void SetZoom(float);
-	static void Retrieve();
+
 	static BMallocIO* Get();
 	static void AddHandler(BHandler*);
 	
-	static float GetScale();
-	static Vector2 GetCoords();	
+	static MapsVector GetVector();
+private:
+	static MapsVector mapsVector;
+
+	static thread_id 			thread;
+	static BUrlRequest*			request;
+	static MapsData_Listener*	listener;
+
+	static BString baseUrl;
 };
 
 #endif // MAPSDATA_H

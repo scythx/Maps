@@ -1,6 +1,6 @@
 #include "Maps.h"
 
-Maps::Maps() : BApplication("application/x-vnd.Haiku-Maps") {
+Maps::Maps() : BApplication("application/x-vnd.Haiku-Maps") {		
 	mapsWindow = new MapsWindow();
 	mapsWindow->Show();
 }

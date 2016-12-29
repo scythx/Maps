@@ -25,7 +25,12 @@ SRCS = \
 	 src/MapsData.cpp  \
 	 src/MapsView.cpp  \
 	 src/MapsWindow.cpp  \
+	 src/SearchForm.cpp  \
 	 src/VirtualScroller.cpp  \
+	 vendor/tinyxml/tinystr.cpp  \
+	 vendor/tinyxml/tinyxml.cpp  \
+	 vendor/tinyxml/tinyxmlerror.cpp  \
+	 vendor/tinyxml/tinyxmlparser.cpp  \
 
 
 #	Specify the resource definition files to use. Full or relative paths can be
@@ -41,6 +46,10 @@ RSRCS = \
 
 # End Pe/Eddie support.
 # @<-src@ 
+#%}
+
+#%}
+
 #%}
 
 #%}
@@ -110,7 +119,7 @@ SYSTEM_INCLUDE_PATHS =
 #	Additional paths paths to look for local headers. These use the form
 #	#include "header". Directories that contain the files in SRCS are
 #	automatically included.
-LOCAL_INCLUDE_PATHS = src/
+LOCAL_INCLUDE_PATHS = src/ vendor/
 
 #	Specify the level of optimization that you want. Specify either NONE (O0),
 #	SOME (O1), FULL (O2), or leave blank (for the default optimization level).
