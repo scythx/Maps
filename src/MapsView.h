@@ -1,6 +1,8 @@
 #ifndef MAPSVIEW_H
 #define MAPSVIEW_H
 
+#include <vector>
+
 #include <View.h>
 #include <Bitmap.h>
 #include <UrlRequest.h>
@@ -9,10 +11,17 @@
 
 #include "VirtualScroller.h"
 
+enum {
+	M_MAPSVIEW_ON_FOCUS = 'mmct',
+	M_MAPSVIEW_ATTACHEDTOWINDOW = 'matw'
+};
+
 class MapsView : public BView {
 public:	
-	MapsView(float, float, float, float, float, int, int);
+	MapsView();
 	virtual ~MapsView();
+
+	void AddHandler(BHandler*);
 
 	virtual void Draw(BRect);
 	virtual void MouseDown(BPoint);
@@ -25,6 +34,8 @@ private:
 
 	bool IsMouseDown;
 	BPoint pastPoint;
+	
+	std::vector<BHandler*> handler;
 };
 
 #endif // MAPSVIEW_H
