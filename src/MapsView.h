@@ -26,6 +26,8 @@ public:
 	virtual void Draw(BRect);
 	virtual void MouseDown(BPoint);
 	virtual void MouseUp(BPoint);
+	virtual void MouseMoved(BPoint, uint32, const BMessage*);
+
 	virtual void MessageReceived(BMessage*);
 private:
 	BBitmap* bitmap;
@@ -33,6 +35,8 @@ private:
 	VirtualScroller* virtualScroller;
 
 	bool IsMouseDown;
+	bool IsTransformNext;
+	BPoint translatePoint;
 	BPoint pastPoint;
 	
 	std::vector<BHandler*> handler;
