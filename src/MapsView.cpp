@@ -110,15 +110,36 @@ void MapsView::MessageReceived(BMessage* message) {
 			MapsVector mapsVector1 = MapsData::GetVector();
 
 			BPoint center;
+			BPoint where;
+			
 			center.x = Bounds().right / 2;
 			center.y = Bounds().bottom / 2;
-
+			GetMouse(&where, NULL);
+			
+			if (center.x != where.x) {
+				if (center.x < where.x) {
+					MapsData::SetLongitude(mapsVector1.longitude + ((where.x - center.x) / mapsVector1.scale));
+				}
+				else {
+					MapsData::SetLongitude(mapsVector1.longitude - ((center.x - where.x) / mapsVector1.scale));
+				}
+			}
+			if (center.y != where.y) {
+				if (center.y < where.y) {
+					MapsData::SetLatitude(mapsVector1.latitude - ((where.y - center.y) / mapsVector1.scale));
+				}
+				else {
+					MapsData::SetLatitude(mapsVector1.latitude + ((center.y - where.y) / mapsVector1.scale));
+				}
+			}
+			
+			mapsVector1 = MapsData::GetVector();
 			BAffineTransform transform;
 			if (mapsVector1.zoom > mapsVector0.zoom) {
-				transform.ScaleBy(center, pow(2.0, mapsVector1.zoom));
+				transform.ScaleBy(where, pow(2.0, mapsVector1.zoom));
 			}
 			else if (mapsVector1.zoom != 0) {
-				transform.ScaleBy(center, sqrt(mapsVector1.zoom));
+				transform.ScaleBy(where, sqrt(mapsVector1.zoom));
 			}
 			SetTransform(transform);
 			MapsData::Retrieve();
