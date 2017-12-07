@@ -231,11 +231,10 @@ void SearchResultList::MessageReceived(BMessage* message) {
 		case M_SEARCHRESULTLIST_ON_INVOKE: {
 			// We have to make sure that the list is not empty
 			// when the user clicks it. Otherwise, it throws an error.
-			if (itemList.size() > 0){
-			MapsData::SetLongitude(itemList[current]->longitude);
-			MapsData::SetLatitude(itemList[current]->latitude);
-
-			MapsData::Retrieve();
+			if (itemList.size() > 0) {
+				MapsData::SetLongitude(itemList[current]->longitude);
+				MapsData::SetLatitude(itemList[current]->latitude);
+				MapsData::Retrieve();
 			}
 		}
 		case M_MAPSVIEW_ON_FOCUS: {
