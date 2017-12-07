@@ -229,10 +229,14 @@ void SearchResultList::MessageReceived(BMessage* message) {
 			current = CurrentSelection();
 		}break;
 		case M_SEARCHRESULTLIST_ON_INVOKE: {
+			// We have to make sure that the list is not empty
+			// when the user clicks it. Otherwise, it throws an error.
+			if (itemList.size() > 0){
 			MapsData::SetLongitude(itemList[current]->longitude);
 			MapsData::SetLatitude(itemList[current]->latitude);
 
 			MapsData::Retrieve();
+			}
 		}
 		case M_MAPSVIEW_ON_FOCUS: {
 			if (scrollBar != NULL) {
@@ -248,7 +252,16 @@ void SearchResultList::MessageReceived(BMessage* message) {
 
 			int index = 0;
 			TiXmlElement* searchresult = document.FirstChildElement("searchresults");
-			for (TiXmlElement* e = searchresult->FirstChildElement("place"); e != NULL; e = e->NextSiblingElement("place")) {
+			// Also, we would want to tell the user when there are no matches.
+			TiXmlElement* e = searchresult->FirstChildElement("place");
+			if (e == NULL) {
+				SearchResultList_Data* itemData = new SearchResultList_Data();
+				AddItem(new BStringItem("No matches found!"), 0);
+				itemData->longitude = 0;
+				itemData->latitude = 0;
+				itemList.insert(std::pair<int, SearchResultList_Data*>(0, itemData));
+			}
+			for (e; e != NULL; e = e->NextSiblingElement("place")) {
 				AddItem(new BStringItem(e->Attribute("display_name")), index);
 				
 				SearchResultList_Data* itemData = new SearchResultList_Data();
@@ -258,6 +271,7 @@ void SearchResultList::MessageReceived(BMessage* message) {
 				itemList.insert(std::pair<int, SearchResultList_Data*>(index, itemData));
 				index++;
 			}
+	
 		}break;
 		default: {
 			BListView::MessageReceived(message);
@@ -280,4 +294,4 @@ void SearchResultList::RequestCompleted(BUrlRequest* caller, bool success) {
 	if (success) {
 		Invoke(new BMessage(M_SEARCHRESULTLIST_ON_RESULT));
 	}
-}
+} 
