@@ -226,7 +226,7 @@ void SearchResultList::MessageReceived(BMessage* message) {
 		case M_SEARCHRESULTLIST_ON_INVOKE: {
 			// We have to make sure that the list is not empty
 			// when the user clicks it. Otherwise, it throws an error.
-			if ((itemList.size() > current) && (current >= 0)) { // Revised
+			if ((itemList.size() > current) && (current >= 0)) {
 				MapsData::SetLongitude(itemList[current]->longitude);
 				MapsData::SetLatitude(itemList[current]->latitude);
 				MapsData::Retrieve();
@@ -251,6 +251,8 @@ void SearchResultList::MessageReceived(BMessage* message) {
 			if (e == NULL) {
 				SearchResultList_Data* itemData = new SearchResultList_Data();
 				AddItem(new BStringItem("No matches found!"), 0);
+				// Disable this item so the user can't click on it.
+				SetEnabled(false);
 				// Set long and lat to current/previous location.
 				MapsVector mapsVector = MapsData::GetVector();
 				itemData->longitude = mapsVector.longitude;
