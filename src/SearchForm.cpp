@@ -293,4 +293,4 @@ void SearchResultList::RequestCompleted(BUrlRequest* caller, bool success) {
 	if (success) {
 		Invoke(new BMessage(M_SEARCHRESULTLIST_ON_RESULT));
 	}
-} 
+}
