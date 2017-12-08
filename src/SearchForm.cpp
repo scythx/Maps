@@ -250,9 +250,10 @@ void SearchResultList::MessageReceived(BMessage* message) {
 			TiXmlElement* e = searchresult->FirstChildElement("place");
 			if (e == NULL) {
 				SearchResultList_Data* itemData = new SearchResultList_Data();
-				AddItem(new BStringItem("No matches found!"), 0);
-				// Disable this item so the user can't click on it.
-				SetEnabled(false);
+				// Disable the item so the user can't click on it.
+				BStringItem* item = new BStringItem("No matches found!");
+				item->SetEnabled(false);
+				AddItem(item);
 				// Set long and lat to current/previous location.
 				MapsVector mapsVector = MapsData::GetVector();
 				itemData->longitude = mapsVector.longitude;
