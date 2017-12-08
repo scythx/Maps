@@ -251,8 +251,10 @@ void SearchResultList::MessageReceived(BMessage* message) {
 			if (e == NULL) {
 				SearchResultList_Data* itemData = new SearchResultList_Data();
 				AddItem(new BStringItem("No matches found!"), 0);
-				itemData->longitude = 0;
-				itemData->latitude = 0;
+				// Set long and lat to current/previous location.
+				MapsVector mapsVector = MapsData::GetVector();
+				itemData->longitude = mapsVector.longitude;
+				itemData->latitude = mapsVector.latitude;
 				itemList.insert(std::pair<int, SearchResultList_Data*>(0, itemData));
 			}
 			for (e; e != NULL; e = e->NextSiblingElement("place")) {
@@ -280,7 +282,6 @@ void SearchResultList::MessageReceived(BMessage* message) {
 void SearchResultList::TargetedByScrollView(BScrollView* view) {
 	scrollBar = view;
 	view->Hide();
-
 	BListView::TargetedByScrollView(view);
 }
 
