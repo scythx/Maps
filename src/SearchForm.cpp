@@ -204,10 +204,6 @@ void SearchResultList::AttachedToWindow() {
 void SearchResultList::MessageReceived(BMessage* message) {
 	switch (message->what) {
 		case M_SEARCHRESULTLIST_SHOW: {
-			if (scrollBar != NULL) {
-				scrollBar->Show();
-			}
-			Show();
 			MakeEmpty();
 			
 			BString url;
@@ -231,7 +227,7 @@ void SearchResultList::MessageReceived(BMessage* message) {
 		case M_SEARCHRESULTLIST_ON_INVOKE: {
 			// We have to make sure that the list is not empty
 			// when the user clicks it. Otherwise, it throws an error.
-			if (itemList.size() > 0) {
+			if ((itemList.size() > current) && (current >= 0)) { // Revised
 				MapsData::SetLongitude(itemList[current]->longitude);
 				MapsData::SetLatitude(itemList[current]->latitude);
 				MapsData::Retrieve();
@@ -270,6 +266,11 @@ void SearchResultList::MessageReceived(BMessage* message) {
 				itemList.insert(std::pair<int, SearchResultList_Data*>(index, itemData));
 				index++;
 			}
+			// The list will only show AFTER all the data is inserted into the list.
+			if (scrollBar != NULL) {
+				scrollBar->Show();
+			}
+			Show();
 	
 		}break;
 		default: {
