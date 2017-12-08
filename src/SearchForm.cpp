@@ -205,7 +205,6 @@ void SearchResultList::MessageReceived(BMessage* message) {
 	switch (message->what) {
 		case M_SEARCHRESULTLIST_SHOW: {
 			MakeEmpty();
-			
 			BString url;
 			url.SetToFormat(baseUrl.String(), message->GetString("Text"));
 
@@ -271,7 +270,6 @@ void SearchResultList::MessageReceived(BMessage* message) {
 				scrollBar->Show();
 			}
 			Show();
-	
 		}break;
 		default: {
 			BListView::MessageReceived(message);
